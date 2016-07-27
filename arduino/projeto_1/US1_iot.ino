@@ -29,6 +29,7 @@ void loop() {
     
     if (leitura == "TMP") {
       Serial.println("entendi, enviando temperatura...");
+      mySerial.println("TMP");
       mySerial.println(temp.getTemp());
     } else {
       Serial.print("nao entendi: ");
