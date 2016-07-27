@@ -1,7 +1,7 @@
 #include <SoftwareSerial.h>
 
 String leitura;
-float temperature;
+int temperature;
 SoftwareSerial mySerial(10, 11); // RX, TX
 
 void setup() {
@@ -12,27 +12,33 @@ void setup() {
 void loop() {
   if (terminalDisponivel()) {
     leitura = lerTerminal();
+    escreverTerminal(leitura);
     if (leitura == "TMP") {
       escreverTerminal("enviando requisicao de temperatura...");
       escreverSecundario(leitura);
-    } else {
+    } 
+    else {
       escreverTerminal("nao entendi requisicao");
+      escreverTerminal(leitura);
     }
   }
-  
+
   if (secundarioDisponivel()) {
     leitura = lerSecundario();
+    escreverTerminal(leitura);
+
     if (leitura == "TMP") {
-      temperature = atof()
-    /*if (temperature <= 18) {
-      mySerial.print('GREEN');
-    } else if(temperature >= 19 && temperature <= 22) {
-      mySerial.print('YELLOW');
-    } else if(temperature > 22) {
-      mySerial.print('GREEN');
-    } else {*/
-      escreverTerminal(leitura);
-    //}
+      temperature = lerSecundario().toInt();
+      /*if (temperature <= 18) {
+       mySerial.print('GREEN');
+       } else if(temperature >= 19 && temperature <= 22) {
+       mySerial.print('YELLOW');
+       } else if(temperature > 22) {
+       mySerial.print('GREEN');
+       } else {*/
+      escreverTerminal(String(temperature));
+      //}
+    }
   }
 }
 
@@ -45,11 +51,11 @@ boolean secundarioDisponivel() {
 }
 
 String lerTerminal() {
-  Serial.readString();
+  return Serial.readString();
 }
 
 String lerSecundario() {
-  mySerial.readString();
+  return mySerial.readStringUntil('\r');
 }
 
 void escreverTerminal(String dados) {
