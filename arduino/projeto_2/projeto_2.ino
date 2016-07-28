@@ -2,34 +2,35 @@
 
 String leitura;
 int temperature;
+
 SoftwareSerial mySerial(10, 11); // RX, TX
 
-boolean estadoLum;
-#define lumBuzzer 2
-#define lumLedRed 4
+boolean estadoLum, changedLum;
+#define lumBuzzer 6
+#define lumLedRed 5
 #define lumLedGreen 3
 
 void setup() {
   Serial.begin(9600);
   mySerial.begin(4800);
   estadoLum = false;
+  changedLum = false;
 }
 
 void loop() {
   if (terminalDisponivel()) {
     leitura = lerTerminal();
     escreverTerminal(leitura);
+    
     if (leitura == "TMP") {
       escreverTerminal("Requisitando temperatura...");
       escreverSecundario(leitura);
     } else if (leitura == "LDR") {
-      escreverTerminal("Requisitando luminosidade...");
-      escreverSecundario(leitura);
       estadoLum = true;
+      changedLum = true;
     } else if (leitura == "NLDR") {
-      escreverTerminal("Desligando luminosidade...");
-      escreverSecundario(leitura);
       estadoLum = false;
+      changedLum = true;
     } else {
       escreverTerminal("Nao entendi...");
       escreverTerminal(leitura);
@@ -38,10 +39,40 @@ void loop() {
 
   if (secundarioDisponivel()) {
     leitura = lerSecundario();
-   
-    escreverTerminal("___________");
-    escreverTerminal(leitura);
-    escreverTerminal("___________");
+
+    if (leitura == "LDR_DATA") {
+      int luminosidade = lerSecundario().toInt();
+      boolean escuro = luminosidade > 750;
+      if (estadoLum) {
+        if (escuro) {
+          // escuro
+          digitalWrite(lumLedRed, HIGH);
+          digitalWrite(lumLedGreen, LOW);
+          digitalWrite(lumBuzzer, HIGH);
+        } else {
+          // claro
+          digitalWrite(lumLedRed, LOW);
+          digitalWrite(lumLedGreen, HIGH);
+          digitalWrite(lumBuzzer, LOW);
+        }
+      } else {
+        digitalWrite(lumLedRed, LOW);
+        digitalWrite(lumLedGreen, LOW);
+        digitalWrite(lumBuzzer, LOW);
+      }
+      if (changedLum) {
+        changedLum = false;
+        if (escuro) {
+          escreverTerminal("NIGHT");
+        } else {
+          escreverTerminal("DAY");
+        }
+      }
+    } else if (leitura != "") {
+      escreverTerminal("__________");
+      escreverTerminal(leitura);
+      escreverTerminal("__________");
+    }
 
     if (leitura == "TMP") {
     
@@ -61,19 +92,6 @@ void loop() {
       escreverTerminal(String(32 + (temperature * 1.8)) + "°F");
       escreverTerminal(String(temperature + 273.15) + "°K");
       
-    } else if (leitura == "LDR_DATA") {
-      int luminosidade = lerSecundario().toInt();
-      if (luminosidade > 500) {
-        // escuro
-        digitalWrite(lumLedRed, HIGH);
-        digitalWrite(lumLedGreen, LOW);
-        digitalWrite(lumBuzzer, HIGH);
-      } else {
-        // claro
-        digitalWrite(lumLedRed, LOW);
-        digitalWrite(lumLedGreen, HIGH);
-        digitalWrite(lumBuzzer, LOW);
-      }
     }
   }
 }

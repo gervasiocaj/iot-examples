@@ -8,6 +8,7 @@
 #define tmpSensor A0
 #define lumSensor A1
 
+#define TWO_SECONDS 2000
 #define TEN_SECONDS 10000
  
 Thermistor temp(tmpSensor);
@@ -16,7 +17,7 @@ SoftwareSerial mySerial(10, 11); // RX, TX
 String leitura;
 int temperature;
 
-long timeoutRed, timeoutYellow, timeoutGreen;
+long timeoutRed, timeoutYellow, timeoutGreen, timeoutLdr;
 
 void setup() {
   Serial.begin(9600);
@@ -25,18 +26,16 @@ void setup() {
   timeoutRed = 0;
   timeoutYellow = 0;
   timeoutGreen = 0;
+  timeoutLdr = 0;
  
   pinMode(tmpLedRed, OUTPUT);
   pinMode(tmpLedGreen, OUTPUT);
   pinMode(tmpLedYellow, OUTPUT);
-
-  pinMode(tmpLedRed, OUTPUT);
 }
  
 void loop() {
   if (secundarioDisponivel()) {
     leitura = lerSecundario();
-    delay(1);
     
     escreverTerminal("__________");
     escreverTerminal(leitura);
@@ -64,11 +63,7 @@ void loop() {
         timeoutRed = millis() + TEN_SECONDS;
       }
       escreverSecundario("TMP_DONE");
-      
-    } else if (leitura == "LDR") {
-      escreverTerminal("Enviando luminosidade...");
-      escreverSecundario("LDR_DATA");
-      escreverSecundario(String(analogRead(lumSensor)));
+    
     } else {
       
       escreverTerminal("nao entendi: ");
@@ -84,6 +79,12 @@ void loop() {
   }
   if (timeoutRed < millis()) {
     digitalWrite(tmpLedRed, LOW);
+  }
+  if (timeoutLdr < millis()) {
+      escreverTerminal("Enviando luminosidade...");
+      escreverSecundario("LDR_DATA");
+      escreverSecundario(String(analogRead(lumSensor)));
+      timeoutLdr = millis() + TWO_SECONDS;
   }
 }
 
