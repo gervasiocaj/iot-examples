@@ -27,6 +27,7 @@ void loop() {
     escreverTerminal(leitura);
 
     if (leitura == "TMP") {
+    
       temperature = lerSecundario().toInt();
       escreverSecundario("TMP_LED");
       if (temperature <= 18) {
@@ -35,6 +36,12 @@ void loop() {
         escreverSecundario("YELLOW");
       } else if(temperature > 22) {
         escreverSecundario("RED");
+      }
+        
+    } else if (leitura == "TMP_DONE") {
+      escreverTerminal(String(temperature) + "°C");
+      escreverTerminal(String(32 + (temperature * 1.8)) + "°F");
+      escreverTerminal(String(temperature + 273.15) + "°K");
     }
   }
 }

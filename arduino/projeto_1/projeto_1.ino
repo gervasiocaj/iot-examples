@@ -95,5 +95,5 @@ void escreverTerminal(String dados) {
 }
 
 void escreverSecundario(String dados) {
-  mySerial.print(dados);
+  mySerial.println(dados);
 }
