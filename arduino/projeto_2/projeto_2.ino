@@ -29,15 +29,13 @@ void loop() {
 
     if (leitura == "TMP") {
       temperature = lerSecundario().toInt();
-      /*if (temperature <= 18) {
-       mySerial.print('GREEN');
-       } else if(temperature >= 19 && temperature <= 22) {
-       mySerial.print('YELLOW');
-       } else if(temperature > 22) {
-       mySerial.print('GREEN');
-       } else {*/
-      escreverTerminal(String(temperature));
-      //}
+      escreverSecundario("TMP_LED");
+      if (temperature <= 18) {
+        escreverSecundario("GREEN");
+      } else if (temperature >= 19 && temperature <= 22) {
+        escreverSecundario("YELLOW");
+      } else if(temperature > 22) {
+        escreverSecundario("RED");
     }
   }
 }

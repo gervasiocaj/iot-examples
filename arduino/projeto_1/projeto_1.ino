@@ -21,19 +21,20 @@ void setup() {
 }
  
 void loop() {
-  if (mySerial.available()) {
-    leitura = mySerial.readString();
+  if (secundarioDisponivel()) {
+    leitura = lerSecundario();
     delay(1);
-    Serial.print("Recebido: ");
-    Serial.println(leitura);
+    escreverTerminal("Recebido: ");
+    escreverTerminal(leitura);
     
     if (leitura == "TMP") {
-      Serial.println("entendi, enviando temperatura...");
-      mySerial.println("TMP");
-      mySerial.println(temp.getTemp());
+      escreverTerminal("entendi, enviando temperatura...");
+      
+      escreverSecundario("TMP");
+      escreverSecundario(temp.getTemp());
     } else {
-      Serial.print("nao entendi: ");
-      Serial.println(leitura);
+      escreverTerminal("nao entendi: ");
+      escreverTerminal(leitura);
     }
     delay(1);
     /*
@@ -51,4 +52,28 @@ void loop() {
     }  
 */
   }
+}
+
+boolean terminalDisponivel() {
+  return Serial.available();
+}
+
+boolean secundarioDisponivel() {
+  return mySerial.available();
+}
+
+String lerTerminal() {
+  return Serial.readString();
+}
+
+String lerSecundario() {
+  return mySerial.readStringUntil('\r');
+}
+
+void escreverTerminal(String dados) {
+  Serial.println(dados);
+}
+
+void escreverSecundario(String dados) {
+  mySerial.print(dados);
 }
