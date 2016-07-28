@@ -1,13 +1,16 @@
 #include <Thermistor.h>
 #include <SoftwareSerial.h>
  
-#define ledRed 2
-#define ledYellow 3
-#define ledGreen 4
+#define tmpLedRed 2
+#define tmpLedYellow 3
+#define tmpLedGreen 4
+
+#define tmpSensor A0
+#define lumSensor A1
 
 #define TEN_SECONDS 10000
  
-Thermistor temp(A0);
+Thermistor temp(tmpSensor);
 SoftwareSerial mySerial(10, 11); // RX, TX
 
 String leitura;
@@ -23,17 +26,21 @@ void setup() {
   timeoutYellow = 0;
   timeoutGreen = 0;
  
-  pinMode(ledRed, OUTPUT);
-  pinMode(ledGreen, OUTPUT);
-  pinMode(ledYellow, OUTPUT);
+  pinMode(tmpLedRed, OUTPUT);
+  pinMode(tmpLedGreen, OUTPUT);
+  pinMode(tmpLedYellow, OUTPUT);
+
+  pinMode(tmpLedRed, OUTPUT);
 }
  
 void loop() {
   if (secundarioDisponivel()) {
     leitura = lerSecundario();
     delay(1);
-    escreverTerminal("Recebido: ");
+    
+    escreverTerminal("__________");
     escreverTerminal(leitura);
+    escreverTerminal("__________");
     
     if (leitura == "TMP") {
       
@@ -44,18 +51,24 @@ void loop() {
     } else if (leitura == "TMP_LED") {
 
       leitura = lerSecundario();
+      escreverTerminal("Alterar para: " + leitura);
+      
       if (leitura == "GREEN") {
-        digitalWrite(ledGreen, HIGH);
+        digitalWrite(tmpLedGreen, HIGH);
         timeoutGreen = millis() + TEN_SECONDS;
       } else if (leitura == "YELLOW") {
-        digitalWrite(ledYellow, HIGH);
+        digitalWrite(tmpLedYellow, HIGH);
         timeoutYellow = millis() + TEN_SECONDS;
       } else if (leitura == "RED") {
-        digitalWrite(ledRed, HIGH);
+        digitalWrite(tmpLedRed, HIGH);
         timeoutRed = millis() + TEN_SECONDS;
       }
       escreverSecundario("TMP_DONE");
       
+    } else if (leitura == "LDR") {
+      escreverTerminal("Enviando luminosidade...");
+      escreverSecundario("LDR_DATA");
+      escreverSecundario(String(analogRead(lumSensor)));
     } else {
       
       escreverTerminal("nao entendi: ");
@@ -64,13 +77,13 @@ void loop() {
     }
   }
   if (timeoutGreen < millis()) {
-    digitalWrite(ledGreen, LOW);
+    digitalWrite(tmpLedGreen, LOW);
   }
   if (timeoutYellow < millis()) {
-    digitalWrite(ledYellow, LOW);
+    digitalWrite(tmpLedYellow, LOW);
   }
   if (timeoutRed < millis()) {
-    digitalWrite(ledRed, LOW);
+    digitalWrite(tmpLedRed, LOW);
   }
 }
 
@@ -87,7 +100,9 @@ String lerTerminal() {
 }
 
 String lerSecundario() {
-  return mySerial.readStringUntil('\r');
+  String a = mySerial.readStringUntil('\r');
+  a.trim();
+  return a;
 }
 
 void escreverTerminal(String dados) {
