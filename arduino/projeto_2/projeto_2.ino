@@ -15,6 +15,10 @@ void setup() {
   mySerial.begin(4800);
   estadoLum = false;
   changedLum = false;
+  
+  pinMode(lumBuzzer, OUTPUT);
+  pinMode(lumLedRed, OUTPUT);
+  pinMode(lumLedGreen, OUTPUT);
 }
 
 void loop() {
@@ -42,7 +46,7 @@ void loop() {
 
     if (leitura == "LDR_DATA") {
       int luminosidade = lerSecundario().toInt();
-      boolean escuro = luminosidade > 750;
+      boolean escuro = luminosidade < 750;
       if (estadoLum) {
         if (escuro) {
           // escuro
