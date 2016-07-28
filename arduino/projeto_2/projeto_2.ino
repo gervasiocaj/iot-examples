@@ -24,7 +24,10 @@ void loop() {
 
   if (secundarioDisponivel()) {
     leitura = lerSecundario();
+   
+    escreverTerminal("___________");
     escreverTerminal(leitura);
+    escreverTerminal("___________");
 
     if (leitura == "TMP") {
     
@@ -59,7 +62,9 @@ String lerTerminal() {
 }
 
 String lerSecundario() {
-  return mySerial.readStringUntil('\r');
+  String a = mySerial.readStringUntil('\r');
+  a.trim();
+  return a;
 }
 
 void escreverTerminal(String dados) {
@@ -67,5 +72,5 @@ void escreverTerminal(String dados) {
 }
 
 void escreverSecundario(String dados) {
-  mySerial.print(dados);
+  mySerial.println(dados);
 }
