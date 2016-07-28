@@ -1,6 +1,3 @@
-String leitura;
-int temperature;
- 
 #include <Thermistor.h>
 #include <SoftwareSerial.h>
  
@@ -10,7 +7,10 @@ int temperature;
  
 Thermistor temp(A0);
 SoftwareSerial mySerial(10, 11); // RX, TX
- 
+
+String leitura;
+int temperature;
+
 void setup() {
   Serial.begin(9600);
   mySerial.begin(4800);
@@ -28,29 +28,28 @@ void loop() {
     escreverTerminal(leitura);
     
     if (leitura == "TMP") {
-      escreverTerminal("entendi, enviando temperatura...");
       
+      escreverTerminal("entendi, enviando temperatura...");
       escreverSecundario("TMP");
       escreverSecundario(temp.getTemp());
+      
+    } else if (leitura == "TMP_LED") {
+      
+      if (leitura == "GREEN") {
+        digitalWrite(ledGreen, HIGH);
+      } else if (leitura == "YELLOW") {
+        digitalWrite(ledYellow, HIGH);
+      } else if (leitura == "RED") {
+        digitalWrite(ledRed, HIGH);
+      }
+      escreverSecundario("TMP_DONE");
+      
     } else {
+      
       escreverTerminal("nao entendi: ");
       escreverTerminal(leitura);
+      
     }
-    delay(1);
-    /*
-    }
-    else if (leitura == 'GREEN') {
-      digitalWrite(ledGreen, HIGH);
-      mySerial.write('OK');  
-    }
-    else if (leitura == 'YELLOW') {
-      digitalWrite(ledYellow, HIGH);  
-      mySerial.write('OK');
-    } else {
-      digitalWrite(ledRed, HIGH);  
-      mySerial.write('OK');
-    }  
-*/
   }
 }
 

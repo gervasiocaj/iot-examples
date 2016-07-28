@@ -16,8 +16,7 @@ void loop() {
     if (leitura == "TMP") {
       escreverTerminal("enviando requisicao de temperatura...");
       escreverSecundario(leitura);
-    } 
-    else {
+    } else {
       escreverTerminal("nao entendi requisicao");
       escreverTerminal(leitura);
     }
